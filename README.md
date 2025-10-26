@@ -2,6 +2,7 @@
 
 This project aims at recreating the TLS and mTLS protocols (v1.3) from scratch in C++.
 Since tls occurs on top of the transport layer (layer 4), we will use sockets as that already implements the protocols from the transport layer. A server and binaries will implement the function of each and will communicate through sockets which already implement all layers up to layer 4.
+TLS is typically ised with HTTP. In this use case, headers are not encrypted. 
 
 
 ## TLS 1.3 Handshake
@@ -74,6 +75,16 @@ Now that the client has received the server keyshare, it can derive the symmetri
 ex:
     {'finished': 'finished'}
 
+#### Encrypted message to server
+The handshake is completed, with the finished message, the first request can be sent
+ex: {'message': ...}
+
+
+### 4. Server -> Client
+The handshake is completed and the server responds to the clients encrypted request with an encrypted response
+
+#### Encrypted message to server
+ex: {'message': ...}
 
 
 ## Start the server
@@ -84,18 +95,15 @@ Build the binaries and start the server
 make server
 ```
 
-Start the client in a seperate terminal
-A number of secnarios will be available as described below.
+Start the client in a seperate terminal and send a message
 ```bash
-make client ARGS="--scenario=x"
+make client ARGS="--message=..."
 ```
 or
 ```bash
-./build/client --scenario=x
+./build/client --message=...
 ```
 
-### Available scenarios
-TBD
 
 All c++ code is found in the src folder and header files are found in the include folder
 

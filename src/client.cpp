@@ -1,83 +1,106 @@
+#include "client.hpp"
 #include <iostream>
-#include <string>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
 
-#define NUMBER_OF_SCENARIOS 8
 
-/**
- * @brief Extracts the scenario number from command-line arguments.
- * 
- * This function searches the command-line arguments for a parameter of the form
- * "--scenario=<number>" and converts the number to an integer. It performs
- * basic validation to ensure the scenario number is within the allowed range.
- * 
- * @param argc The number of command-line arguments.
- * @param argv The array of command-line argument strings.
- * @return int The extracted scenario number if valid; returns 0 on error
- *             (invalid format, out of range, or below 1). Prints error messages
- *             to std::cout in case of invalid input.
- * 
- * @note The valid range for scenario numbers is 1 to NUMBER_OF_SCENARIOS.
- */
-int extract_scenario_number(int argc, char* argv[])
+std::string extract_message(int argc, char* argv[])
 {
-   std::string input_number;
+    std::string message = "";
 
     for (int i = 1; i < argc; ++i) 
     {
         std::string arg = argv[i];
-        std::string prefix = "--scenario=";
+        std::string prefix = "--message=";
         if (arg.substr(0, prefix.size()) == prefix) 
         {
-            input_number = arg.substr(prefix.size());
+            message = arg.substr(prefix.size());
         }
     }
+    if (message == "")
+    {
+        throw "Error or empty message";
+    }
+    return message;
+}
 
-    int scenario_number = 0;
-    try
+
+Client::Client(int port_number) : port_num(port_number)
+{
+    sock = 0;
+    struct sockaddr_in serv_addr;
+
+    sock = socket(AF_INET, SOCK_STREAM, 0);
+    if (sock < 0)
     {
-        scenario_number = std::stoi(input_number);
-    } 
-    catch (const std::invalid_argument& e)
-    {
-        std::cout << "Invalid number!\n";
-        return 0;
-    } 
-    catch (const std::out_of_range& e)
-    {
-        std::cout << "Number out of range!\n";
-        return 0;
+        throw "Socket failed";
     }
 
-    if (scenario_number < 1)
+    serv_addr.sin_family = AF_INET;
+    serv_addr.sin_port = htons(port_num);
+    if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
     {
-        std::cout << "Scenarios must be over the value of 0" << std::endl;
-        return 0;
-    }
-    if (scenario_number > NUMBER_OF_SCENARIOS)
-    {
-        std::cout << "Scenarios number can't be above " << NUMBER_OF_SCENARIOS << std::endl;
+        throw "Invalid address";
     }
 
-    return scenario_number;
+    if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
+    {
+        throw "Connection failed";
+    }
+}
+
+Client::~Client()
+{
+    close(sock);
+}
+
+
+void Client::sendMessage(std::string message)
+{
+    send(sock, message.c_str(), message.size(), 0);
+}
+
+std::string Client::receiveMessage()
+{
+    std::string buffer(1024, '\0');
+    read(sock, &buffer[0], buffer.size());
+    return buffer;
 }
 
 
 int main(int argc, char* argv[]) 
 {
-    int scenario_number = extract_scenario_number(argc, argv);
+    std::string message = extract_message(argc, argv);
 
-    switch (scenario_number)
-    {
-    case 0:
-        return 0;
-    case 1:
-        std::cout << "Hello world with scenario " << scenario_number << std::endl;
-        break;
-    
-    default:
-        std::cout << "Hello world with scenario " << scenario_number << std::endl;
-        break;
-    }
+
+    Client client(8080);
+
+    // Process handshake request
+
+    // 1. Client sends handshake request
+    client.sendMessage("HS");
+
+    // 2. Client receiveds responses to the handshake request
+    std::string received = client.receiveMessage();
+
+    // Client processes the response and validates the server's authentication
+    std::cout << received << std::endl;
+
+    // Client encrypts the message
+
+    // 3. Sends encrypted message
+    client.sendMessage(message);
+
+    // 3. Receives encrypted message
+    std::string encrypted_message_received = client.receiveMessage();
+
+    // Decrypts message
+    std::string message_received = "";
+    std::cout << "Encrypted message received: " << encrypted_message_received << "\n";
+    std::cout << "Message received: " << message_received << std::endl;
 
     return 0;
+
 }

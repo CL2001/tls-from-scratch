@@ -11,6 +11,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 include_directories(include)
 
 # Add the executable
-add_executable(main
-    src/main.cpp
+add_executable(server
+    src/server.cpp
+)
+
+# Add the executable
+add_executable(client
+    src/client.cpp
 )

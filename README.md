@@ -87,7 +87,11 @@ make server
 Start the client in a seperate terminal
 A number of secnarios will be available as described below.
 ```bash
-make client scenario=x
+make client ARGS="--scenario=x"
+```
+or
+```bash
+./build/client --scenario=x
 ```
 
 ### Available scenarios

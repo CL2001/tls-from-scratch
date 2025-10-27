@@ -26,7 +26,7 @@ ex:
 
 The server will look over all cipher suites sent by the client fo this one. If it is not found, a hello retry request and the connection will be aborted.
 ex:
-    {'hello_retry_request': ''}
+    {'hello_retry_request': 'retry'}
 
 #### Key share
 A key share is created through some sort of algorithm example Diffie-Hellman key exchange.

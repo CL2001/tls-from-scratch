@@ -1,5 +1,11 @@
 #pragma once
 #include <string>
+#include <iostream>
+#include <cstring>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+
 
 class Client
 {

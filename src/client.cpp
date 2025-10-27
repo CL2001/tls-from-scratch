@@ -1,9 +1,5 @@
 #include "client.hpp"
-#include <iostream>
-#include <cstring>
-#include <sys/socket.h>
-#include <arpa/inet.h>
-#include <unistd.h>
+#include "encryption_hash.hpp"
 
 
 std::string extract_message(int argc, char* argv[])
@@ -70,36 +66,70 @@ std::string Client::receiveMessage()
 }
 
 
+std::string generateHandshakeRequest(int client_key_share)
+{
+    std::string handshake_request_message = 
+    "{'hello': 'hello', "
+    "'cypher_suites': [{'encryption': 'my_eaed', 'hash', 'my_hash'}], "
+    "'key_share': ";
+    handshake_request_message += client_key_share;
+    handshake_request_message += "}";
+    return handshake_request_message;
+}
+
+
+bool helloRetryRequest(std::string)
+{
+    return false;
+}
+
+int extractServerKeyshare(std::string msg)
+{
+    return 0;
+}
+
+
+bool validateCertificate(std::string)
+{
+    return false;
+}
+
+
 int main(int argc, char* argv[]) 
 {
     std::string message = extract_message(argc, argv);
-
-
     Client client(8080);
 
     // Process handshake request
+    int client_key_share = generateRandomKeyshare();
+    std::string handshake_request = generateHandshakeRequest(client_key_share);
 
     // 1. Client sends handshake request
-    client.sendMessage("HS");
+    client.sendMessage(handshake_request);
 
     // 2. Client receiveds responses to the handshake request
-    std::string received = client.receiveMessage();
+    std::string handshake_response = client.receiveMessage();
 
     // Client processes the response and validates the server's authentication
-    std::cout << received << std::endl;
+    if (helloRetryRequest(handshake_response))
+        return -1;
+    int server_key_share = extractServerKeyshare(handshake_response);
+    int symmetric_key = deriveKey(client_key_share, server_key_share);
+    if (!validateCertificate(handshake_response))
+        return -1;
 
-    // Client encrypts the message
 
     // 3. Sends encrypted message
-    client.sendMessage(message);
+    std::string encrypted_message = encrypt(symmetric_key, message);
+    client.sendMessage(encrypted_message);
 
     // 3. Receives encrypted message
-    std::string encrypted_message_received = client.receiveMessage();
+    std::string encrypted_response = client.receiveMessage();
 
     // Decrypts message
-    std::string message_received = "";
-    std::cout << "Encrypted message received: " << encrypted_message_received << "\n";
-    std::cout << "Message received: " << message_received << std::endl;
+    std::string response = decrypt(symmetric_key, encrypted_response);
+    std::cout << "Encrypted message received: " << encrypted_response << "\n";
+    std::cout << "Message received: " << response << std::endl;
 
     return 0;
 

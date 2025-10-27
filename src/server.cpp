@@ -1,4 +1,5 @@
 #include "server.hpp"
+#include "encryption_hash.hpp"
 
 Server::Server(int port_number) : port_num(port_number)
 {
@@ -67,6 +68,40 @@ void Server::sendMessage(std::string message)
         throw "Send failed";
 }
 
+bool helloReceived(std::string msg)
+{
+    return true;
+}
+
+bool myCiphers(std::string msg)
+{
+    return true;
+}
+
+int extractClientKeyshare(std::string msg)
+{
+    return 0;
+}
+
+std::string getServerCertificate()
+{
+    return " ";
+}
+
+
+std::string generateResponse(int server_key_share, std::string encrypted_certificate, 
+                                std::string encrypted_finish)
+{
+    return " ";
+}
+
+
+std::string serverProcessMessage(std::string msg)
+{
+    return "Server got: " + msg;
+}
+
+
 int main() {
     Server server(8080);
 
@@ -74,21 +109,29 @@ int main() {
     std::string handshake_request = server.listenForMessages();
 
     // Process the clients tls hanshake
-    std::string handshake_response = "Server got " + handshake_request;
+    if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
+        server.sendMessage("{'hello_retry_request': 'retry'}"); return -1;
+    int client_key_share = extractClientKeyshare(handshake_request);
+    int server_key_share = generateRandomKeyshare();
+    int symmetric_key = deriveKey(client_key_share, server_key_share);
+    std::string certificate_signature = getServerCertificate();
+    std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature);
+    std::string encrypted_finished = encrypt(symmetric_key, certificate_signature);
+    std::string response = generateResponse(server_key_share, encrypted_certificate, 
+                                            encrypted_finished);
 
     // 2. Server respondes to the handshake request
-    server.sendMessage(handshake_response);
+    server.sendMessage(response);
 
     // 3. Receives encrypted message
     std::string encrypted_message_received = server.listenForMessages();
 
-    // Decrypts message
-    std::string message_received = "";
+    // Decrypt message, 0rocesses the response and send an encrypted response
+    std::string message_received = decrypt(symmetric_key, encrypted_message_received);
     std::cout << "Encrypted message received: " << encrypted_message_received << "\n";
     std::cout << "Message received: " << message_received << std::endl;
-
-    // Processes the response and sends an encrypted message
-    std::string encrypted_message_to_send = "Server got: " + encrypted_message_received;
+    std::string message_to_send = serverProcessMessage(message_received);
+    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send);
 
     // 4. Respond with encrypted message
     server.sendMessage(encrypted_message_to_send);

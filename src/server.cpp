@@ -49,7 +49,7 @@ Server::~Server()
 
 
 
-std::string Server::listenForMessages()
+std::string_view Server::listenForMessages()
 {
     std::string buffer(1024, '\0');
     ssize_t bytes_read = read(client_fd, &buffer[0], buffer.size());
@@ -68,17 +68,17 @@ void Server::sendMessage(std::string message)
         throw "Send failed";
 }
 
-bool helloReceived(std::string msg)
+bool helloReceived(std::string_view msg)
 {
     return true;
 }
 
-bool myCiphers(std::string msg)
+bool myCiphers(std::string_view msg)
 {
     return true;
 }
 
-int extractClientKeyshare(std::string msg)
+int extractClientKeyshare(std::string_view msg)
 {
     return 0;
 }
@@ -89,8 +89,8 @@ std::string getServerCertificate()
 }
 
 
-std::string generateResponse(int server_key_share, std::string encrypted_certificate, 
-                                std::string encrypted_finish)
+std::string generateResponse(int server_key_share, std::string_view encrypted_certificate, 
+                                std::string_view encrypted_finish)
 {
     return " ";
 }
@@ -106,32 +106,32 @@ int main() {
     Server server(8080);
 
     // 1. Server receives handshake request
-    std::string handshake_request = server.listenForMessages();
+    std::string_view handshake_request = server.listenForMessages();
 
     // Process the clients tls hanshake
     if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
         server.sendMessage("{'hello_retry_request': 'retry'}"); return -1;
-    int client_key_share = extractClientKeyshare(handshake_request);
-    int server_key_share = generateRandomKeyshare();
-    int symmetric_key = deriveKey(client_key_share, server_key_share);
-    std::string certificate_signature = getServerCertificate();
-    std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature);
-    std::string encrypted_finished = encrypt(symmetric_key, certificate_signature);
-    std::string response = generateResponse(server_key_share, encrypted_certificate, 
-                                            encrypted_finished);
+    int client_key_share = extractClientKeyshare(handshake_request); //TO DO
+    int server_key_share = generateRandomKeyshare(); //TO DO
+    int symmetric_key = deriveKey(client_key_share, server_key_share); //TO DO
+    std::string certificate_signature = getServerCertificate(); //TO DO
+    std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature); //TO DO
+    std::string encrypted_finished = encrypt(symmetric_key, certificate_signature); //TO DO
+    std::string response = generateResponse(server_key_share, encrypted_certificate, //TO DO
+                                            encrypted_finished); //TO DO
 
     // 2. Server respondes to the handshake request
     server.sendMessage(response);
 
     // 3. Receives encrypted message
-    std::string encrypted_message_received = server.listenForMessages();
+    std::string_view encrypted_message_received = server.listenForMessages();
 
     // Decrypt message, 0rocesses the response and send an encrypted response
-    std::string message_received = decrypt(symmetric_key, encrypted_message_received);
+    std::string message_received = decrypt(symmetric_key, encrypted_message_received); //TO DO
     std::cout << "Encrypted message received: " << encrypted_message_received << "\n";
     std::cout << "Message received: " << message_received << std::endl;
-    std::string message_to_send = serverProcessMessage(message_received);
-    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send);
+    std::string message_to_send = serverProcessMessage(message_received); //TO DO
+    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send); //TO DO
 
     // 4. Respond with encrypted message
     server.sendMessage(encrypted_message_to_send);

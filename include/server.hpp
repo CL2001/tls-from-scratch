@@ -14,6 +14,6 @@ private:
 public:
     Server(int);
     ~Server();
-    std::string listenForMessages();
+    std::string_view listenForMessages();
     void sendMessage(std::string);
 };

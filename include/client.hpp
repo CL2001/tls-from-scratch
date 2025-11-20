@@ -16,5 +16,5 @@ public:
     Client(int);
     ~Client();
     void sendMessage(std::string);
-    std::string receiveMessage();
+    std::string_view receiveMessage();
 };

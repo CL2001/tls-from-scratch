@@ -14,12 +14,12 @@ include_directories(include)
 add_executable(server
     src/server.cpp
     src/encryption_hash.cpp
-    src/helper.cpp
+    src/json.cpp
 )
 
 # Add the executable
 add_executable(client
     src/client.cpp
     src/encryption_hash.cpp
-    src/helper.cpp
+    src/json.cpp
 )

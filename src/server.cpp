@@ -1,5 +1,7 @@
 #include "server.hpp"
 #include "encryption_hash.hpp"
+#include "json.hpp"
+
 
 Server::Server(int port_number) : port_num(port_number)
 {
@@ -103,6 +105,19 @@ std::string serverProcessMessage(std::string msg)
 
 
 int main() {
+    // Temp test
+    std::string_view json = R"({
+        "name": "John",
+        "age": 30,
+        "admin": true,
+        "address": { "city": "NY", "zip": 12345 },
+        "tags": [1,2,3]
+    })";
+    Json json_obj(json);
+    std::cout << json << std::endl;
+    std::cout << json_obj["name"] << std::endl;
+    // Temp test
+
     Server server(8080);
 
     // 1. Server receives handshake request

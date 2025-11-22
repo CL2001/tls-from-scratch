@@ -1,5 +1,4 @@
 #include "encryption_hash.hpp"
-#include <random>
 int P = 39'579'539; // Large prime
 int G = (P - 1) / 2;
 
@@ -44,7 +43,7 @@ int deriveKey(int foreign_key_messsage, int key_share)
 
 std::string encrypt(int key, std::string msg)
 {
-    return "hi";
+    return "e_" + msg;
 }
 
 

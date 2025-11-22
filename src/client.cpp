@@ -103,12 +103,16 @@ int main(int argc, char* argv[])
     // 1. Client sends handshake request
     int key_share = generateRandomNumber();
     int client_key_share_msg = generateRandomKeyshareMsg(key_share);
+
     std::string handshake_request = generateHandshakeRequest(client_key_share_msg);
-    std::cout << handshake_request << std::endl;
     client.sendMessage(handshake_request);
-    return 0;
+    std::cout << "1. Sent handshake request\n" << handshake_request << "\n\n";
+
     // 2. Client receives responses to the handshake request
     std::string handshake_response = client.receiveMessage();
+    std::cout << "2. Handshake response received\n" << handshake_response << "\n\n";
+    return 0;
+
     if (helloRetryRequest(handshake_response)) //TO DO
         return -1;
     int server_key_share_msg = extractServerKeyshare(handshake_response); //TO DO

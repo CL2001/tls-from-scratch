@@ -1,5 +1,6 @@
 #pragma once
 #include <string>
+#include <random>
 
 int generateRandomNumber(void);
 int generateRandomKeyshareMsg(int);

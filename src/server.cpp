@@ -91,14 +91,17 @@ int extractClientKeyshare(Json msg)
 
 std::string getServerCertificate()
 {
-    return " ";
+    return "-----BEGIN CERTIFICATE-----Base64certificateForSimpleServer-----END CERTIFICATE-----";
 }
 
 
-std::string generateResponse(int server_key_share, std::string encrypted_certificate, 
-                                std::string encrypted_finish)
+std::string generateResponse(int symmetric_key, int server_key_share, std::string certificate)
 {
-    return " ";
+    return "{\"hello\": \"hello\", "
+    "\"cypher_suites_chosen\": {\"encryption\": \"my_eaed\", \"hash\", \"my_hash\"}, "
+    "\"key_share\": " + std::to_string(server_key_share) + ","
+    "\"certificate: \": " + encrypt(symmetric_key, certificate) + ","
+    "\"finished\": " + encrypt(symmetric_key, "finished") + "}";
 }
 
 
@@ -113,7 +116,7 @@ int main() {
 
     // 1. Server receives handshake request
     Json handshake_request(server.listenForMessages());
-    std::cout << "1. Handshake request received\n" << handshake_request << std::endl;
+    std::cout << "1. Handshake request received\n" << handshake_request << "\n\n";
 
     if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
     {
@@ -122,23 +125,16 @@ int main() {
     }
 
     int client_key_share_msg = extractClientKeyshare(handshake_request);
-
     int key_share = generateRandomNumber();
     int server_key_share = generateRandomKeyshareMsg(key_share);
-    
     int symmetric_key = deriveKey(client_key_share_msg, key_share);
-    std::cout << symmetric_key << std::endl;
-    return 0;
 
     // 2. Server respondes to the handshake request
-    std::string certificate_signature = getServerCertificate(); //TO DO
-    std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature); //TO DO
-
-    std::string encrypted_finished = encrypt(symmetric_key, "{\"finished\": \"finished\"}"); //TO DO
-    std::string response = generateResponse(server_key_share, encrypted_certificate, //TO DO
-                                            encrypted_finished); //TO DO
-
+    std::string certificate_signature = getServerCertificate();
+    std::string response = generateResponse(symmetric_key, server_key_share, certificate_signature);
     server.sendMessage(response);
+    std::cout << "2. Sent handshake response\n" << response << "\n\n";
+    return 0;
 
     // 3. Receives encrypted message
     std::string encrypted_message_received = server.listenForMessages();

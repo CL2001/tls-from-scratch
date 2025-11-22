@@ -1,6 +1,7 @@
 #include "encryption_hash.hpp"
 #include <random>
-
+int P = 39'579'539; // Large prime
+int G = (P - 1) / 2;
 
 int generateRandomNumber()
 {
@@ -11,9 +12,19 @@ int generateRandomNumber()
 }
 
 
-int generateRandomKeyshare(int key_share)
+int generateRandomKeyshareMsg(int key_share)
 {
-    return 0;
+    
+    int result = 1;
+    int base = G % P;
+    while (key_share > 0)
+    {
+        if ((key_share & 1) == 1)
+            result = (result * base) % P;
+        base = (base * base) % P;
+        key_share = key_share >> 1;
+    }
+    return result;
 }
 
 

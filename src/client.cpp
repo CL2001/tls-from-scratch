@@ -102,7 +102,7 @@ int main(int argc, char* argv[])
 
     // 1. Client sends handshake request
     int key_share = generateRandomNumber();
-    int client_key_share_msg = generateRandomKeyshare(key_share); //TO DO
+    int client_key_share_msg = generateRandomKeyshareMsg(key_share); //TO DO
     std::string handshake_request = generateHandshakeRequest(client_key_share_msg); //TO DO
     client.sendMessage(handshake_request);
 

@@ -126,7 +126,7 @@ int main() {
         server.sendMessage("{'hello_retry_request': 'retry'}"); return -1;
     int client_key_share_msg = extractClientKeyshare(handshake_request); //TO DO
     int key_share = generateRandomNumber();
-    int server_key_share = generateRandomKeyshare(key_share); //TO DO
+    int server_key_share = generateRandomKeyshareMsg(key_share); //TO DO
     int symmetric_key = deriveKey(client_key_share_msg, key_share); //TO DO
     std::string certificate_signature = getServerCertificate(); //TO DO
     std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature); //TO DO

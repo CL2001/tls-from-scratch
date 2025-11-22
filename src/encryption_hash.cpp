@@ -1,7 +1,13 @@
 #include "encryption_hash.hpp"
 
 
-int generateRandomKeyshare()
+int generateRandomNumber()
+{
+    return 0;
+}
+
+
+int generateRandomKeyshare(int key_share)
 {
     return 0;
 }

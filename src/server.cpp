@@ -122,13 +122,12 @@ int main() {
 
     // 1. Server receives handshake request
     std::string_view handshake_request = server.listenForMessages();
-
-    // Process the clients tls hanshake
     if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
         server.sendMessage("{'hello_retry_request': 'retry'}"); return -1;
-    int client_key_share = extractClientKeyshare(handshake_request); //TO DO
-    int server_key_share = generateRandomKeyshare(); //TO DO
-    int symmetric_key = deriveKey(client_key_share, server_key_share); //TO DO
+    int client_key_share_msg = extractClientKeyshare(handshake_request); //TO DO
+    int key_share = generateRandomNumber();
+    int server_key_share = generateRandomKeyshare(key_share); //TO DO
+    int symmetric_key = deriveKey(client_key_share_msg, key_share); //TO DO
     std::string certificate_signature = getServerCertificate(); //TO DO
     std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature); //TO DO
     std::string encrypted_finished = encrypt(symmetric_key, certificate_signature); //TO DO

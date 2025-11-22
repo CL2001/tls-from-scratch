@@ -1,9 +1,13 @@
 #include "encryption_hash.hpp"
+#include <random>
 
 
 int generateRandomNumber()
 {
-    return 0;
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<int> dist(1, 1'000'000);
+    return dist(gen);
 }
 
 

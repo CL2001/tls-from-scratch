@@ -4,11 +4,11 @@
 
 class Json {
 private:
-    std::string_view json;
+    std::string json;
     bool isValid();
 public:
-    Json(std::string_view);
-    std::string_view operator[](std::string_view);
+    Json(std::string);
+    std::string operator[](std::string);
     friend std::ostream& operator<<(std::ostream& os, const Json& j)
     {
         os << j.json;

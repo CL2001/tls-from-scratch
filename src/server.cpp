@@ -51,7 +51,7 @@ Server::~Server()
 
 
 
-std::string_view Server::listenForMessages()
+std::string Server::listenForMessages()
 {
     std::string buffer(1024, '\0');
     ssize_t bytes_read = read(client_fd, &buffer[0], buffer.size());
@@ -70,19 +70,19 @@ void Server::sendMessage(std::string message)
         throw "Send failed";
 }
 
-bool helloReceived(std::string_view msg)
+bool helloReceived(Json msg)
 {
-    return true;
+    return msg["hello"] == "hello";
 }
 
-bool myCiphers(std::string_view msg)
+bool myCiphers(Json msg)
 {
-    return true;
+    return msg["cypher_suites"] == "[{\"encryption\": \"my_eaed\", \"hash\", \"my_hash\"}]";
 }
 
-int extractClientKeyshare(std::string_view msg)
+int extractClientKeyshare(Json msg)
 {
-    return 0;
+    return std::stoi(msg["key_share"]);
 }
 
 std::string getServerCertificate()
@@ -91,8 +91,8 @@ std::string getServerCertificate()
 }
 
 
-std::string generateResponse(int server_key_share, std::string_view encrypted_certificate, 
-                                std::string_view encrypted_finish)
+std::string generateResponse(int server_key_share, std::string encrypted_certificate, 
+                                std::string encrypted_finish)
 {
     return " ";
 }
@@ -105,31 +105,28 @@ std::string serverProcessMessage(std::string msg)
 
 
 int main() {
-    // Temp test
-    std::string_view json = R"({
-        "name": "John",
-        "age": 30,
-        "admin": true,
-        "address": { "city": "NY", "zip": 12345 },
-        "tags": [1,2,3]
-    })";
-    Json json_obj(json);
-    std::cout << json << std::endl;
-    std::cout << json_obj["name"] << std::endl;
-    // Temp test
-
     Server server(8080);
 
     // 1. Server receives handshake request
-    std::string_view handshake_request = server.listenForMessages();
+    Json handshake_request(server.listenForMessages());
+
     if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
-        server.sendMessage("{'hello_retry_request': 'retry'}"); return -1;
+    {
+        server.sendMessage("{\"hello_retry_request\": \"retry\"}");
+        return -1;
+    }
+
     int client_key_share_msg = extractClientKeyshare(handshake_request); //TO DO
+    std::cout << client_key_share_msg << std::endl;
+    return 0;
+
     int key_share = generateRandomNumber();
-    int server_key_share = generateRandomKeyshareMsg(key_share); //TO DO
+    int server_key_share = generateRandomKeyshareMsg(key_share);
     int symmetric_key = deriveKey(client_key_share_msg, key_share); //TO DO
+
     std::string certificate_signature = getServerCertificate(); //TO DO
     std::string encrypted_certificate = encrypt(symmetric_key, certificate_signature); //TO DO
+
     std::string encrypted_finished = encrypt(symmetric_key, certificate_signature); //TO DO
     std::string response = generateResponse(server_key_share, encrypted_certificate, //TO DO
                                             encrypted_finished); //TO DO
@@ -138,7 +135,7 @@ int main() {
     server.sendMessage(response);
 
     // 3. Receives encrypted message
-    std::string_view encrypted_message_received = server.listenForMessages();
+    std::string encrypted_message_received = server.listenForMessages();
 
     // Decrypt message, 0rocesses the response and send an encrypted response
     std::string message_received = decrypt(symmetric_key, encrypted_message_received); //TO DO

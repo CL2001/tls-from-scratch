@@ -34,13 +34,13 @@ int deriveKey(int server_key_share, int client_key_share)
 }
 
 
-std::string encrypt(int key, std::string_view msg)
+std::string encrypt(int key, std::string msg)
 {
     return "hi";
 }
 
 
-std::string decrypt(int key, std::string_view encrypt_msg)
+std::string decrypt(int key, std::string encrypt_msg)
 {
     return "hi";
 }

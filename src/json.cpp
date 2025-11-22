@@ -1,7 +1,7 @@
 #include "json.hpp"
 
 
-Json::Json(std::string_view json) : json(json)
+Json::Json(std::string json) : json(json)
 {
     if (!isValid())
         json = {};
@@ -29,7 +29,7 @@ bool Json::isValid()
 }
 
 
-std::string_view Json::operator[](std::string_view key)
+std::string Json::operator[](std::string key)
 {
     // ---- Find the key ----
     std::string quotedKey;

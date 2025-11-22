@@ -58,7 +58,7 @@ void Client::sendMessage(std::string message)
     send(sock, message.c_str(), message.size(), 0);
 }
 
-std::string_view Client::receiveMessage()
+std::string Client::receiveMessage()
 {
     std::string buffer(1024, '\0');
     read(sock, &buffer[0], buffer.size());
@@ -69,27 +69,27 @@ std::string_view Client::receiveMessage()
 std::string generateHandshakeRequest(int client_key_share_msg)
 {
     std::string handshake_request_message = 
-    "{'hello': 'hello', "
-    "'cypher_suites': [{'encryption': 'my_eaed', 'hash', 'my_hash'}], "
-    "'key_share': ";
-    handshake_request_message += client_key_share_msg;
+    "{\"hello\": \"hello\", "
+    "\"cypher_suites\": [{\"encryption\": \"my_eaed\", \"hash\", \"my_hash\"}], "
+    "\"key_share\": ";
+    handshake_request_message += std::to_string(client_key_share_msg);
     handshake_request_message += "}";
     return handshake_request_message;
 }
 
 
-bool helloRetryRequest(std::string_view)
+bool helloRetryRequest(std::string)
 {
     return false;
 }
 
-int extractServerKeyshare(std::string_view msg)
+int extractServerKeyshare(std::string msg)
 {
     return 0;
 }
 
 
-bool validateCertificate(std::string_view)
+bool validateCertificate(std::string)
 {
     return false;
 }
@@ -102,12 +102,13 @@ int main(int argc, char* argv[])
 
     // 1. Client sends handshake request
     int key_share = generateRandomNumber();
-    int client_key_share_msg = generateRandomKeyshareMsg(key_share); //TO DO
-    std::string handshake_request = generateHandshakeRequest(client_key_share_msg); //TO DO
+    int client_key_share_msg = generateRandomKeyshareMsg(key_share);
+    std::string handshake_request = generateHandshakeRequest(client_key_share_msg);
+    std::cout << handshake_request << std::endl;
     client.sendMessage(handshake_request);
-
+    return 0;
     // 2. Client receives responses to the handshake request
-    std::string_view handshake_response = client.receiveMessage();
+    std::string handshake_response = client.receiveMessage();
     if (helloRetryRequest(handshake_response)) //TO DO
         return -1;
     int server_key_share_msg = extractServerKeyshare(handshake_response); //TO DO
@@ -120,7 +121,7 @@ int main(int argc, char* argv[])
     client.sendMessage(encrypted_message);
 
     // 4. Receives encrypted message
-    std::string_view encrypted_response = client.receiveMessage();
+    std::string encrypted_response = client.receiveMessage();
     std::string response = decrypt(symmetric_key, encrypted_response); //TO DO
     std::cout << "Encrypted message received: " << encrypted_response << "\n";
     std::cout << "Message received: " << response << std::endl;

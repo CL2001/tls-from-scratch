@@ -3,6 +3,23 @@
 int P = 39'579'539; // Large prime
 int G = (P - 1) / 2;
 
+
+// Result = g^a mod p
+int modexp(int g, int a, int p)
+{
+    int result = 1;
+    int base = g % p;
+    while (a > 0)
+    {
+        if ((a & 1) == 1)
+            result = (result * base) % p;
+        base = (base * base) % p;
+        a = a >> 1;
+    }
+    return result;  
+}
+
+
 int generateRandomNumber()
 {
     std::random_device rd;
@@ -11,26 +28,17 @@ int generateRandomNumber()
     return dist(gen);
 }
 
-
+// Keyshare message = g^key_share % p
 int generateRandomKeyshareMsg(int key_share)
 {
-    
-    int result = 1;
-    int base = G % P;
-    while (key_share > 0)
-    {
-        if ((key_share & 1) == 1)
-            result = (result * base) % P;
-        base = (base * base) % P;
-        key_share = key_share >> 1;
-    }
-    return result;
+    return modexp(G, key_share, P);
 }
 
 
-int deriveKey(int server_key_share, int client_key_share)
+// Key = foreign_key_message^key_share % p
+int deriveKey(int foreign_key_messsage, int key_share)
 {
-    return 0;
+    return modexp(foreign_key_messsage, key_share, P);
 }
 
 

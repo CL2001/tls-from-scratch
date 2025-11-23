@@ -1,21 +1,20 @@
 #include "encryption_hash.hpp"
-int P = 39'579'539; // Large prime
-int G = (P - 1) / 2;
 
+uint64_t P = 39'579'539ULL;
+uint64_t G = 2ULL;
 
-// Result = g^a mod p
-int modexp(int g, int a, int p)
+uint64_t modexp(uint64_t base, uint64_t exp, uint64_t mod)
 {
-    int result = 1;
-    int base = g % p;
-    while (a > 0)
+    uint64_t result = 1;
+    base %= mod;
+    while (exp > 0)
     {
-        if ((a & 1) == 1)
-            result = (result * base) % p;
-        base = (base * base) % p;
-        a = a >> 1;
+        if (exp & 1)
+            result = (result * base) % mod;
+        base = (base * base) % mod;
+        exp >>= 1;
     }
-    return result;  
+    return result;
 }
 
 
@@ -23,7 +22,7 @@ int generateRandomNumber()
 {
     std::random_device rd;
     std::mt19937 gen(rd());
-    std::uniform_int_distribution<int> dist(1, 1'000'000);
+    std::uniform_int_distribution<int> dist(1, P-2);
     return dist(gen);
 }
 
@@ -41,7 +40,7 @@ int deriveKey(int foreign_key_messsage, int key_share)
 }
 
 
-std::string encryption_algorithm(int key, std::string msg)
+std::string encryptionAlgorithm(int key, std::string msg)
 {
     std::array<char, 4> key_arr{
     static_cast<char>((key >> 24) & 0xFF),
@@ -61,7 +60,7 @@ std::string encryption_algorithm(int key, std::string msg)
 
 std::string encrypt(int key, std::string msg)
 {
-    return encryption_algorithm(key, msg);
+    return encryptionAlgorithm(key, msg);
 }
 
 

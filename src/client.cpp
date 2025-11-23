@@ -16,7 +16,7 @@ std::string extract_message(int argc, char* argv[])
     }
     if (message == "")
     {
-        throw "Error or empty message";
+        throw std::runtime_error("Error or empty message");
     }
     return message;
 }
@@ -30,24 +30,25 @@ Client::Client(int port_number) : port_num(port_number)
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock < 0)
     {
-        throw "Socket failed";
+        throw std::runtime_error("Socket failed");
     }
 
     serv_addr.sin_family = AF_INET;
     serv_addr.sin_port = htons(port_num);
     if (inet_pton(AF_INET, "127.0.0.1", &serv_addr.sin_addr) <= 0)
     {
-        throw "Invalid address";
+        throw std::runtime_error("Invalid address");
     }
 
     if (connect(sock, (struct sockaddr*)&serv_addr, sizeof(serv_addr)) < 0)
     {
-        throw "Connection failed";
+        throw std::runtime_error("Connection failed");
     }
 }
 
 Client::~Client()
 {
+    std::cout << "Client on port " << sock << " is closed" << std::endl;
     close(sock);
 }
 
@@ -77,15 +78,9 @@ std::string generateHandshakeRequest(int client_key_share_msg)
 }
 
 
-std::string decryptHandshake(Json msg)
-{
-    msg["cerificate"] = "hi";
-}
-
-
 bool helloRetryRequest(Json msg)
 {
-    return false;
+    return !(msg["hello"] == "hello");
 }
 
 int extractServerKeyshare(Json msg)
@@ -115,13 +110,15 @@ int main(int argc, char* argv[])
 
     // 2. Client receives responses to the handshake request
     Json handshake_response = client.receiveMessage();
-    std::cout << "2. Handshake response received after decryption\n" << decryptHandshake(handshake_response) << "\n\n";
-    return 0;
+    std::cout << "2. Handshake response received\n" << handshake_response << "\n\n";
 
     if (helloRetryRequest(handshake_response)) //TO DO
         return -1;
-    int server_key_share_msg = extractServerKeyshare(handshake_response); //TO DO
-    int symmetric_key = deriveKey(server_key_share_msg, key_share); //TO DO
+
+    int server_key_share_msg = stoi(handshake_response["key_share"]);
+    int symmetric_key = deriveKey(server_key_share_msg, key_share);
+    std::cout << symmetric_key << std::endl;
+    return 0;
     if (!validateCertificate(handshake_response)) //TO DO
         return -1;
 

@@ -7,7 +7,7 @@ Server::Server(int port_number) : port_num(port_number)
     server_fd = socket(AF_INET, SOCK_STREAM, 0);
     if (server_fd == -1)
     {
-        throw "Couldn't create socket";
+        throw std::runtime_error("Couldn't create socket");
     }
 
     // 2. Bind socket to port
@@ -18,14 +18,14 @@ Server::Server(int port_number) : port_num(port_number)
     {
         close(server_fd);
         std::string error_str = "Couldn't bind socket to port " + port_num;
-        throw error_str;
+        throw std::runtime_error(error_str);
     }
 
     // 3. Listen for connections
     if (listen(server_fd, 3) < 0)
     {
         close(server_fd);
-        throw "Listen failed";
+        throw std::runtime_error("Listen failed");
     }
 
     std::cout << "Server listening on port " << port_num << std::endl;
@@ -34,7 +34,7 @@ Server::Server(int port_number) : port_num(port_number)
     if (client_fd < 0)
     {
         close(server_fd);
-        throw "Accept failed";
+        throw std::runtime_error("Accept failed");
     }
 
     std::cout << "Client connected to server" << std::endl;
@@ -54,7 +54,7 @@ std::string Server::listenForMessages()
     std::string buffer(1024, '\0');
     ssize_t bytes_read = read(client_fd, &buffer[0], buffer.size());
     if (bytes_read < 0)
-        throw "Read failed";
+        throw std::runtime_error("Read failed");
     else
         buffer.resize(bytes_read);
     return buffer;
@@ -65,7 +65,7 @@ void Server::sendMessage(std::string message)
 {
     ssize_t bytes_sent = send(client_fd, message.c_str(), message.size(), 0);
     if (bytes_sent < 0)
-        throw "Send failed";
+        throw std::runtime_error("Send failed");
 }
 
 
@@ -118,7 +118,7 @@ int main() {
 
     if (!helloReceived(handshake_request) || !myCiphers(handshake_request))
     {
-        server.sendMessage("{\"hello_retry_request\": \"retry\"}");
+        server.sendMessage("{\"hello\": \"retry\"}");
         return -1;
     }
 
@@ -132,6 +132,7 @@ int main() {
     std::string response = generateResponse(symmetric_key, server_key_share, certificate_signature);
     server.sendMessage(response);
     std::cout << "2. Sent handshake response\n" << response << "\n\n";
+    std::cout << symmetric_key << std::endl;
     return 0;
 
     // 3. Receives encrypted message

@@ -2,6 +2,7 @@
 #include <string>
 #include <random>
 #include <array>
+#include <cstdint>
 
 int generateRandomNumber(void);
 int generateRandomKeyshareMsg(int);

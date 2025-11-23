@@ -4,6 +4,7 @@
 #include <array>
 #include <cstdint>
 #include <sstream>
+#include "json.hpp"
 
 int generateRandomNumber(void);
 int generateRandomKeyshareMsg(int);

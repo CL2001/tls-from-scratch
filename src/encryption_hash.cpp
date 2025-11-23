@@ -118,5 +118,9 @@ std::string messageEncrypt(int symmetric_key, std::string msg)
 
 std::string messageDecrypt(int symmetric_key, std::string msg)
 {
-    return "hi";
+    Json json_msg = msg;
+    std::string r_msg = json_msg["message"];
+    std::string msg_hash = json_msg["hash"];
+    r_msg = decrypt(symmetric_key, r_msg);
+    return hash(r_msg) == msg_hash ? r_msg : "";
 }

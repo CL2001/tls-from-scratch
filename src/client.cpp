@@ -118,11 +118,10 @@ int main(int argc, char* argv[])
     std::cout << "3. Message to send\n" << message << "\n";
     std::cout << "Encrypted message to send\n" << encrypted_message_to_send << "\n\n";
     client.sendMessage(encrypted_message_to_send);
-    return 0;
 
     // 4. Receives encrypted message
     std::string encrypted_response = client.receiveMessage();
-    std::string response = messageDecrypt(symmetric_key, encrypted_response); // TODO
+    std::string response = messageDecrypt(symmetric_key, encrypted_response);
     std::cout << "4. Encrypted response received\n" << encrypted_response << "\n";
     std::cout << "Message received\n" << response << "\n\n";
 

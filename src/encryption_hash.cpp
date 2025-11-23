@@ -41,9 +41,27 @@ int deriveKey(int foreign_key_messsage, int key_share)
 }
 
 
+std::string encryption_algorithm(int key, std::string msg)
+{
+    std::array<char, 4> key_arr{
+    static_cast<char>((key >> 24) & 0xFF),
+    static_cast<char>((key >> 16) & 0xFF),
+    static_cast<char>((key >> 8)  & 0xFF),
+    static_cast<char>( key        & 0xFF)
+    };
+
+    for (int i = 0; i < msg.length(); i++)
+    {
+        int mod = i % 4;
+        msg[i] ^= key_arr[mod];
+    }
+    return msg;
+}
+
+
 std::string encrypt(int key, std::string msg)
 {
-    return "e_" + msg;
+    return encryption_algorithm(key, msg);
 }
 
 

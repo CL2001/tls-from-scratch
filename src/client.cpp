@@ -1,5 +1,4 @@
 #include "client.hpp"
-#include "encryption_hash.hpp"
 
 
 std::string extract_message(int argc, char* argv[])
@@ -78,18 +77,24 @@ std::string generateHandshakeRequest(int client_key_share_msg)
 }
 
 
-bool helloRetryRequest(std::string)
+std::string decryptHandshake(Json msg)
+{
+    msg["cerificate"] = "hi";
+}
+
+
+bool helloRetryRequest(Json msg)
 {
     return false;
 }
 
-int extractServerKeyshare(std::string msg)
+int extractServerKeyshare(Json msg)
 {
     return 0;
 }
 
 
-bool validateCertificate(std::string)
+bool validateCertificate(Json)
 {
     return false;
 }
@@ -109,8 +114,8 @@ int main(int argc, char* argv[])
     std::cout << "1. Sent handshake request\n" << handshake_request << "\n\n";
 
     // 2. Client receives responses to the handshake request
-    std::string handshake_response = client.receiveMessage();
-    std::cout << "2. Handshake response received\n" << handshake_response << "\n\n";
+    Json handshake_response = client.receiveMessage();
+    std::cout << "2. Handshake response received after decryption\n" << decryptHandshake(handshake_response) << "\n\n";
     return 0;
 
     if (helloRetryRequest(handshake_response)) //TO DO

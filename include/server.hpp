@@ -3,6 +3,9 @@
 #include <string>
 #include <netinet/in.h>
 #include <unistd.h>
+#include "encryption_hash.hpp"
+#include "json.hpp"
+
 
 class Server
 {

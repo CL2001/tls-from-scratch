@@ -1,6 +1,4 @@
 #include "server.hpp"
-#include "encryption_hash.hpp"
-#include "json.hpp"
 
 
 Server::Server(int port_number) : port_num(port_number)
@@ -100,7 +98,7 @@ std::string generateResponse(int symmetric_key, int server_key_share, std::strin
     return "{\"hello\": \"hello\", "
     "\"cypher_suites_chosen\": {\"encryption\": \"my_eaed\", \"hash\", \"my_hash\"}, "
     "\"key_share\": " + std::to_string(server_key_share) + ","
-    "\"certificate: \": " + encrypt(symmetric_key, certificate) + ","
+    "\"certificate\": " + encrypt(symmetric_key, certificate) + ","
     "\"finished\": " + encrypt(symmetric_key, "finished") + "}";
 }
 

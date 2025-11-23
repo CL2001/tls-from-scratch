@@ -5,6 +5,8 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "encryption_hash.hpp"
+#include "json.hpp"
 
 
 class Client

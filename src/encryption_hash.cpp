@@ -58,13 +58,42 @@ std::string encryptionAlgorithm(int key, std::string msg)
 }
 
 
+std::string stringToArr(std::string str)
+{
+    std::string return_str;
+
+    for (char c : str)
+        return_str += std::to_string(static_cast<uint8_t>(c)) + "_";
+    return return_str;
+}
+
+
+std::string arrToString(const std::string& str)
+{
+    std::string return_str;
+    std::stringstream ss(str);
+    std::string token;
+
+    while (std::getline(ss, token, '_'))
+    {
+        if (!token.empty()) // skip empty tokens (last underscore)
+        {
+            int val = std::stoi(token);
+            return_str += static_cast<char>(val);
+        }
+    }
+
+    return return_str;
+}
+
+
 std::string encrypt(int key, std::string msg)
 {
-    return encryptionAlgorithm(key, msg);
+    return stringToArr(encryptionAlgorithm(key, msg));
 }
 
 
 std::string decrypt(int key, std::string encrypt_msg)
 {
-    return "hi";
+    return encryptionAlgorithm(key, arrToString(encrypt_msg));
 }

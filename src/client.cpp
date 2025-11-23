@@ -83,15 +83,12 @@ bool helloRetryRequest(Json msg)
     return !(msg["hello"] == "hello");
 }
 
-int extractServerKeyshare(Json msg)
-{
-    return 0;
-}
 
-
-bool validateCertificate(Json)
+bool validateCertificate(int symmetric_key, Json msg)
 {
-    return false;
+    std::string encrypted_cert = msg["certificate"];
+    std::string cert = decrypt(symmetric_key, encrypted_cert);
+    return cert == "-----BEGIN CERTIFICATE-----Base64certificateForSimpleServer-----END CERTIFICATE-----";
 }
 
 
@@ -112,25 +109,23 @@ int main(int argc, char* argv[])
     Json handshake_response = client.receiveMessage();
     std::cout << "2. Handshake response received\n" << handshake_response << "\n\n";
 
-    if (helloRetryRequest(handshake_response)) //TO DO
+    if (helloRetryRequest(handshake_response))
         return -1;
 
     int server_key_share_msg = stoi(handshake_response["key_share"]);
     int symmetric_key = deriveKey(server_key_share_msg, key_share);
-    std::cout << symmetric_key << std::endl;
-    return 0;
-    if (!validateCertificate(handshake_response)) //TO DO
+    if (!validateCertificate(symmetric_key, handshake_response))
         return -1;
-
+    return 0;
     // 3. Sends encrypted message
-    std::string encrypted_message = encrypt(symmetric_key, message); //TO DO
+    std::string encrypted_message = encrypt(symmetric_key, message);
     client.sendMessage(encrypted_message);
 
     // 4. Receives encrypted message
     std::string encrypted_response = client.receiveMessage();
-    std::string response = decrypt(symmetric_key, encrypted_response); //TO DO
-    std::cout << "Encrypted message received: " << encrypted_response << "\n";
-    std::cout << "Message received: " << response << std::endl;
+    std::string response = decrypt(symmetric_key, encrypted_response);
+    std::cout << "Encrypted response received: " << encrypted_response << "\n";
+    std::cout << "Response received: " << response << std::endl;
 
     return 0;
 

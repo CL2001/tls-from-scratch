@@ -3,6 +3,7 @@
 #include <random>
 #include <array>
 #include <cstdint>
+#include <sstream>
 
 int generateRandomNumber(void);
 int generateRandomKeyshareMsg(int);

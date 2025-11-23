@@ -68,13 +68,9 @@ std::string Client::receiveMessage()
 
 std::string generateHandshakeRequest(int client_key_share_msg)
 {
-    std::string handshake_request_message = 
-    "{\"hello\": \"hello\", "
+    return "{\"hello\": \"hello\", "
     "\"cypher_suites\": [{\"encryption\": \"my_eaed\", \"hash\", \"my_hash\"}], "
-    "\"key_share\": ";
-    handshake_request_message += std::to_string(client_key_share_msg);
-    handshake_request_message += "}";
-    return handshake_request_message;
+    "\"key_share\": " + std::to_string(client_key_share_msg) + "}";
 }
 
 
@@ -89,12 +85,6 @@ bool validateCertificate(int symmetric_key, Json msg)
     std::string encrypted_cert = msg["certificate"];
     std::string cert = decrypt(symmetric_key, encrypted_cert);
     return cert == "-----BEGIN CERTIFICATE-----Base64certificateForSimpleServer-----END CERTIFICATE-----";
-}
-
-
-std::string clientCreateMessage(std::string message)
-{
-    return "hi"
 }
 
 
@@ -122,19 +112,19 @@ int main(int argc, char* argv[])
     int symmetric_key = deriveKey(server_key_share_msg, key_share);
     if (!validateCertificate(symmetric_key, handshake_response))
         return -1;
-    return 0;
+
     // 3. Sends encrypted message
-    std::string message_to_send = clientCreateMessage(message); //To do
-    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send);
-    std::cout << "3. Message to send\n" << message_to_send << "\n";
-    std::cout << "Encrypted message to send\n" << encrypted_message_to_send << std::endl;
+    std::string encrypted_message_to_send = messageEncrypt(symmetric_key, message);
+    std::cout << "3. Message to send\n" << message << "\n";
+    std::cout << "Encrypted message to send\n" << encrypted_message_to_send << "\n\n";
     client.sendMessage(encrypted_message_to_send);
+    return 0;
 
     // 4. Receives encrypted message
     std::string encrypted_response = client.receiveMessage();
-    std::string response = decrypt(symmetric_key, encrypted_response);
+    std::string response = messageDecrypt(symmetric_key, encrypted_response); // TODO
     std::cout << "4. Encrypted response received\n" << encrypted_response << "\n";
-    std::cout << "Message received\n" << response << "\n";
+    std::cout << "Message received\n" << response << "\n\n";
 
     return 0;
 

@@ -77,14 +77,14 @@ ex:
 
 #### Encrypted message to server
 The handshake is completed, with the finished message, the first request can be sent
-ex: {"message": ...}
+ex: {"message": ..., "hash": ...}
 
 
 ### 4. Server -> Client
 The handshake is completed and the server responds to the clients encrypted request with an encrypted response
 
 #### Encrypted message to server
-ex: {"message": ...}
+ex: {"message": ..., "hash": ...}
 
 
 ## Start the server

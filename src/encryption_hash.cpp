@@ -97,3 +97,26 @@ std::string decrypt(int key, std::string encrypt_msg)
 {
     return encryptionAlgorithm(key, arrToString(encrypt_msg));
 }
+
+
+std::string hash(std::string msg)
+{
+    uint32_t h = 0xabcdef01;
+    for (char c : msg) {
+        h ^= (h << 5) + (h >> 2) + static_cast<uint8_t>(c);
+    }
+    return std::to_string(h);
+}
+
+
+std::string messageEncrypt(int symmetric_key, std::string msg)
+{
+    return "{\"message\": " + encrypt(symmetric_key, msg) + ","
+    "\"hash\": " + hash(msg) + "}";
+}
+
+
+std::string messageDecrypt(int symmetric_key, std::string msg)
+{
+    return "hi";
+}

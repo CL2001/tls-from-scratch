@@ -92,6 +92,12 @@ bool validateCertificate(int symmetric_key, Json msg)
 }
 
 
+std::string clientCreateMessage(std::string message)
+{
+    return "hi"
+}
+
+
 int main(int argc, char* argv[]) 
 {
     std::string message = extract_message(argc, argv);
@@ -118,14 +124,17 @@ int main(int argc, char* argv[])
         return -1;
     return 0;
     // 3. Sends encrypted message
-    std::string encrypted_message = encrypt(symmetric_key, message);
-    client.sendMessage(encrypted_message);
+    std::string message_to_send = clientCreateMessage(message); //To do
+    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send);
+    std::cout << "3. Message to send\n" << message_to_send << "\n";
+    std::cout << "Encrypted message to send\n" << encrypted_message_to_send << std::endl;
+    client.sendMessage(encrypted_message_to_send);
 
     // 4. Receives encrypted message
     std::string encrypted_response = client.receiveMessage();
     std::string response = decrypt(symmetric_key, encrypted_response);
-    std::cout << "Encrypted response received: " << encrypted_response << "\n";
-    std::cout << "Response received: " << response << std::endl;
+    std::cout << "4. Encrypted response received\n" << encrypted_response << "\n";
+    std::cout << "Message received\n" << response << "\n";
 
     return 0;
 

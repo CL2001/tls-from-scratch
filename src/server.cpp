@@ -139,14 +139,16 @@ int main() {
     std::string encrypted_message_received = server.listenForMessages();
 
     std::string message_received = decrypt(symmetric_key, encrypted_message_received);
-    std::cout << "Encrypted message received: " << encrypted_message_received << "\n";
-    std::cout << "Message received: " << message_received << std::endl;
+    std::cout << "3. Encrypted message received\n" << encrypted_message_received << "\n";
+    std::cout << "Message received\n" << message_received << "\n";
 
     // 4. Respond with encrypted message
-    std::string message_to_send = serverProcessMessage(message_received); //TO DO
-    std::string encrypted_message_to_send = encrypt(symmetric_key, message_to_send);
+    std::string resp_to_send = serverProcessMessage(message_received); //TO DO
+    std::string encrypted_resp_to_send = encrypt(symmetric_key, resp_to_send);
+    std::cout << "4. Response to send\n" << resp_to_send << "\n";
+    std::cout << "Encrypted response to send\n" << encrypted_resp_to_send << std::endl;
 
-    server.sendMessage(encrypted_message_to_send);
+    server.sendMessage(encrypted_resp_to_send);
 
     return 0;
 }
